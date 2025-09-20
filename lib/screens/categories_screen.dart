@@ -11,6 +11,9 @@ class CategoriesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final screenSize = MediaQuery.of(context).size;
+    final isSmallScreen = screenSize.width < 400;
+    final crossAxisCount = screenSize.width < 350 ? 1 : 2;
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
@@ -31,7 +34,7 @@ class CategoriesScreen extends StatelessWidget {
           }
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(isSmallScreen ? 12.0 : 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -51,40 +54,44 @@ class CategoriesScreen extends StatelessWidget {
                   child: TextField(
                     decoration: InputDecoration(
                       hintText: l10n.search,
+                      hintStyle: TextStyle(fontSize: isSmallScreen ? 14 : 16),
                       prefixIcon: const Icon(Icons.search, color: Colors.grey),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: isSmallScreen ? 12 : 16,
+                        vertical: isSmallScreen ? 10 : 12,
                       ),
                     ),
+                    style: TextStyle(fontSize: isSmallScreen ? 14 : 16),
                     onChanged: (value) {
                       booksProvider.setSearchQuery(value);
                     },
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                SizedBox(height: isSmallScreen ? 20 : 24),
 
-                // Categories Grid
+                // Categories Grid Title
                 Text(
                   'Browse Categories',
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Colors.grey[800],
+                        fontSize: isSmallScreen ? 18 : 22,
                       ),
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: isSmallScreen ? 12 : 16),
 
+                // Categories Grid
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 1.5,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    childAspectRatio: crossAxisCount == 1 ? 3.0 : 1.5,
+                    crossAxisSpacing: isSmallScreen ? 12 : 16,
+                    mainAxisSpacing: isSmallScreen ? 12 : 16,
                   ),
                   itemCount: categories.length,
                   itemBuilder: (context, index) {
@@ -120,51 +127,89 @@ class CategoriesScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              top: 16,
-                              left: 16,
-                              child: Icon(
-                                _getCategoryIcon(category),
-                                color: Colors.white,
-                                size: 32,
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 16,
-                              left: 16,
-                              right: 16,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    category,
-                                    style: const TextStyle(
+                        child: Padding(
+                          padding: EdgeInsets.all(isSmallScreen ? 12.0 : 16.0),
+                          child: crossAxisCount == 1
+                              ? Row(
+                                  children: [
+                                    Icon(
+                                      _getCategoryIcon(category),
                                       color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                      size: isSmallScreen ? 24 : 32,
                                     ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '${categoryBooks.length} books',
-                                    style: TextStyle(
-                                      color: Colors.white.withOpacity(0.8),
-                                      fontSize: 12,
+                                    SizedBox(width: isSmallScreen ? 12 : 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              category,
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize:
+                                                    isSmallScreen ? 16 : 18,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            '${categoryBooks.length} books',
+                                            style: TextStyle(
+                                              color:
+                                                  Colors.white.withOpacity(0.8),
+                                              fontSize: isSmallScreen ? 12 : 14,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                                  ],
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      _getCategoryIcon(category),
+                                      color: Colors.white,
+                                      size: isSmallScreen ? 24 : 32,
+                                    ),
+                                    const Spacer(),
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        category,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: isSmallScreen ? 14 : 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '${categoryBooks.length} books',
+                                      style: TextStyle(
+                                        color: Colors.white.withOpacity(0.8),
+                                        fontSize: isSmallScreen ? 10 : 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                         ),
                       ),
                     );
                   },
                 ),
 
-                const SizedBox(height: 24),
+                SizedBox(height: isSmallScreen ? 20 : 24),
 
                 // All Books Section
                 Text(
@@ -172,20 +217,21 @@ class CategoriesScreen extends StatelessWidget {
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Colors.grey[800],
+                        fontSize: isSmallScreen ? 18 : 22,
                       ),
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: isSmallScreen ? 12 : 16),
 
                 // Books Grid
                 GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 0.7,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: crossAxisCount,
+                    childAspectRatio: crossAxisCount == 1 ? 1.2 : 0.7,
+                    crossAxisSpacing: isSmallScreen ? 12 : 16,
+                    mainAxisSpacing: isSmallScreen ? 12 : 16,
                   ),
                   itemCount: booksProvider.filteredBooks.length,
                   itemBuilder: (context, index) {

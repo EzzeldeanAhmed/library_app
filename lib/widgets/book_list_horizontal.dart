@@ -16,6 +16,10 @@ class BookListHorizontal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final itemWidth = screenWidth < 400 ? 140.0 : 160.0;
+    final itemHeight = screenWidth < 400 ? 240.0 : 280.0;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -25,12 +29,15 @@ class BookListHorizontal extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[800],
-                    ),
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[800],
+                        fontSize: screenWidth < 400 ? 18 : 22,
+                      ),
+                ),
               ),
               if (onSeeAll != null)
                 TextButton(
@@ -40,6 +47,7 @@ class BookListHorizontal extends StatelessWidget {
                     style: TextStyle(
                       color: Colors.teal[600],
                       fontWeight: FontWeight.w600,
+                      fontSize: screenWidth < 400 ? 12 : 14,
                     ),
                   ),
                 ),
@@ -51,7 +59,7 @@ class BookListHorizontal extends StatelessWidget {
 
         // Books List
         SizedBox(
-          height: 280,
+          height: itemHeight,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -59,8 +67,8 @@ class BookListHorizontal extends StatelessWidget {
             itemBuilder: (context, index) {
               final book = books[index];
               return Container(
-                width: 160,
-                margin: const EdgeInsets.only(right: 16),
+                width: itemWidth,
+                margin: const EdgeInsets.only(right: 12),
                 child: BookCard(book: book),
               );
             },

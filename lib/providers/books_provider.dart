@@ -49,10 +49,10 @@ class BooksProvider with ChangeNotifier {
         title: 'The Great Gatsby',
         author: 'F. Scott Fitzgerald',
         description:
-            'A classic American novel set in the Jazz Age, exploring themes of wealth, love, and the American Dream.',
+            'A classic American novel set in the Jazz Age, exploring themes of wealth, love, and the American Dream. Follow Nick Carraway as he tells the story of his mysterious neighbor Jay Gatsby and his obsession with Daisy Buchanan.',
         price: 12.99,
         imageUrl:
-            'https://via.placeholder.com/300x400/FF6B6B/FFFFFF?text=The+Great+Gatsby',
+            'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=400&fit=crop',
         category: 'Fiction',
         rating: 4.2,
         reviewCount: 1205,
@@ -64,10 +64,10 @@ class BooksProvider with ChangeNotifier {
         title: 'To Kill a Mockingbird',
         author: 'Harper Lee',
         description:
-            'A gripping tale of racial injustice and childhood innocence in the American South.',
+            'A gripping tale of racial injustice and childhood innocence in the American South. Through the eyes of Scout Finch, experience a powerful story about moral courage and human dignity.',
         price: 14.99,
         imageUrl:
-            'https://via.placeholder.com/300x400/4ECDC4/FFFFFF?text=To+Kill+a+Mockingbird',
+            'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop',
         category: 'Fiction',
         rating: 4.5,
         reviewCount: 2341,
@@ -78,10 +78,10 @@ class BooksProvider with ChangeNotifier {
         title: 'Sapiens',
         author: 'Yuval Noah Harari',
         description:
-            'A brief history of humankind, exploring how humans conquered the world.',
+            'A brief history of humankind, exploring how humans conquered the world. From the Stone Age to the Silicon Age, discover the forces that shaped our species and our world.',
         price: 16.99,
         imageUrl:
-            'https://via.placeholder.com/300x400/45B7D1/FFFFFF?text=Sapiens',
+            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=400&fit=crop',
         category: 'History',
         rating: 4.4,
         reviewCount: 1876,
@@ -93,10 +93,10 @@ class BooksProvider with ChangeNotifier {
         title: 'The Alchemist',
         author: 'Paulo Coelho',
         description:
-            'A philosophical novel about following your dreams and finding your personal legend.',
+            'A philosophical novel about following your dreams and finding your personal legend. Join Santiago on his journey from Spain to Egypt in search of treasure and wisdom.',
         price: 13.99,
         imageUrl:
-            'https://via.placeholder.com/300x400/96CEB4/FFFFFF?text=The+Alchemist',
+            'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=300&h=400&fit=crop',
         category: 'Fiction',
         rating: 4.1,
         reviewCount: 3421,
@@ -107,10 +107,10 @@ class BooksProvider with ChangeNotifier {
         title: 'Educated',
         author: 'Tara Westover',
         description:
-            'A memoir about education, family, and the struggle for self-invention.',
+            'A memoir about education, family, and the struggle for self-invention. A powerful story of transformation through learning and the price of knowledge.',
         price: 15.99,
         imageUrl:
-            'https://via.placeholder.com/300x400/FFEAA7/000000?text=Educated',
+            'https://images.unsplash.com/photo-1519791883288-dc8bd696e667?w=300&h=400&fit=crop',
         category: 'Biography',
         rating: 4.6,
         reviewCount: 987,
@@ -121,9 +121,10 @@ class BooksProvider with ChangeNotifier {
         title: 'Dune',
         author: 'Frank Herbert',
         description:
-            'A science fiction masterpiece set on the desert planet Arrakis.',
+            'A science fiction masterpiece set on the desert planet Arrakis. Follow Paul Atreides in an epic tale of politics, religion, and ecology in the far future.',
         price: 18.99,
-        imageUrl: 'https://via.placeholder.com/300x400/DDA0DD/000000?text=Dune',
+        imageUrl:
+            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=400&fit=crop',
         category: 'Science Fiction',
         rating: 4.3,
         reviewCount: 2156,
@@ -134,10 +135,10 @@ class BooksProvider with ChangeNotifier {
         title: 'Atomic Habits',
         author: 'James Clear',
         description:
-            'An easy and proven way to build good habits and break bad ones.',
+            'An easy and proven way to build good habits and break bad ones. Learn how tiny changes can lead to remarkable results in this practical guide to behavior change.',
         price: 14.99,
         imageUrl:
-            'https://via.placeholder.com/300x400/FF7675/FFFFFF?text=Atomic+Habits',
+            'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=300&h=400&fit=crop',
         category: 'Self Help',
         rating: 4.7,
         reviewCount: 4532,
@@ -149,14 +150,43 @@ class BooksProvider with ChangeNotifier {
         title: 'Gone Girl',
         author: 'Gillian Flynn',
         description:
-            'A psychological thriller about a marriage gone terribly wrong.',
+            'A psychological thriller about a marriage gone terribly wrong. When Amy Dunne disappears, all eyes turn to her husband Nick in this twisty tale of deception.',
         price: 13.99,
         imageUrl:
-            'https://via.placeholder.com/300x400/A29BFE/FFFFFF?text=Gone+Girl',
+            'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=400&fit=crop',
         category: 'Mystery',
         rating: 4.0,
         reviewCount: 1789,
         isFeatured: true,
+      ),
+      Book(
+        id: '9',
+        title: '1984',
+        author: 'George Orwell',
+        description:
+            'A dystopian novel about totalitarianism and surveillance. In a world where Big Brother watches everything, Winston Smith struggles to maintain his humanity.',
+        price: 11.99,
+        imageUrl:
+            'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400&fit=crop',
+        category: 'Fiction',
+        rating: 4.4,
+        reviewCount: 5623,
+        isFeatured: true,
+        isBestSeller: true,
+      ),
+      Book(
+        id: '10',
+        title: 'The 7 Habits of Highly Effective People',
+        author: 'Stephen R. Covey',
+        description:
+            'A powerful approach to personal and professional effectiveness. Learn the habits that can transform your life and help you achieve your goals.',
+        price: 17.99,
+        imageUrl:
+            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=400&fit=crop',
+        category: 'Self Help',
+        rating: 4.3,
+        reviewCount: 2890,
+        isNewArrival: true,
       ),
     ];
     notifyListeners();
