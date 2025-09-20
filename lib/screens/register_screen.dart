@@ -50,19 +50,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _isLoading = false;
     });
 
-    if (success) {
-      if (mounted) {
-        // Navigation is handled by the main app based on auth state
-      }
-    } else {
-      if (mounted && authProvider.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authProvider.errorMessage!),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+    if (!success && mounted && authProvider.errorMessage != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(authProvider.errorMessage!),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -148,7 +142,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your name';
                               }
-                              if (value.length < 2) {
+                              if (value.trim().length < 2) {
                                 return 'Name must be at least 2 characters';
                               }
                               return null;
@@ -172,7 +166,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               if (value == null || value.isEmpty) {
                                 return 'Please enter your email';
                               }
-                              if (!value.contains('@')) {
+                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                  .hasMatch(value)) {
                                 return 'Please enter a valid email';
                               }
                               return null;

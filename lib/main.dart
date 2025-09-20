@@ -3,6 +3,7 @@ import 'package:library_app/screens/welcome_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'providers/books_provider.dart';
 import 'providers/cart_provider.dart';
@@ -13,6 +14,10 @@ import 'screens/main_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  await Firebase.initializeApp();
+
   runApp(const LibraryApp());
 }
 

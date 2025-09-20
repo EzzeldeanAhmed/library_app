@@ -42,16 +42,19 @@ class ProfileScreen extends StatelessWidget {
                         CircleAvatar(
                           radius: 50,
                           backgroundColor: Colors.white,
-                          child: Text(
-                            user?.name.isNotEmpty == true
-                                ? user!.name[0].toUpperCase()
-                                : 'U',
-                            style: const TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.teal,
-                            ),
-                          ),
+                          child: user?.profileImage.isNotEmpty == true
+                              ? ClipOval(
+                                  child: Image.network(
+                                    user!.profileImage,
+                                    width: 100,
+                                    height: 100,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return _buildInitialsAvatar(user.name);
+                                    },
+                                  ),
+                                )
+                              : _buildInitialsAvatar(user?.name ?? 'User'),
                         ),
                         const SizedBox(height: 12),
                         Text(
@@ -90,7 +93,36 @@ class ProfileScreen extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.all(20),
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Profile Information',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const EditProfileScreen(),
+                                        ),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.edit,
+                                        color: Colors.teal),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
                               _buildInfoRow(
                                 icon: Icons.person,
                                 label: l10n.name,
@@ -117,6 +149,55 @@ class ProfileScreen extends StatelessWidget {
                                 value: user?.address.isNotEmpty == true
                                     ? user!.address
                                     : 'Not set',
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Account Stats Card
+                      Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Account Statistics',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleLarge
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                              const SizedBox(height: 16),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildStatCard(
+                                      icon: Icons.shopping_bag,
+                                      title: 'Orders',
+                                      value: '0',
+                                      color: Colors.blue,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: _buildStatCard(
+                                      icon: Icons.favorite,
+                                      title: 'Favorites',
+                                      value: '0',
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -169,7 +250,6 @@ class ProfileScreen extends StatelessWidget {
                               icon: Icons.settings,
                               title: l10n.settings,
                               onTap: () {
-                                // TODO: Implement settings screen
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text('Settings coming soon!')),
@@ -182,7 +262,6 @@ class ProfileScreen extends StatelessWidget {
                               icon: Icons.help_outline,
                               title: 'Help & Support',
                               onTap: () {
-                                // TODO: Implement help screen
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text('Help coming soon!')),
@@ -245,6 +324,17 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildInitialsAvatar(String name) {
+    return Text(
+      name.isNotEmpty ? name[0].toUpperCase() : 'U',
+      style: const TextStyle(
+        fontSize: 32,
+        fontWeight: FontWeight.bold,
+        color: Colors.teal,
+      ),
+    );
+  }
+
   Widget _buildInfoRow({
     required IconData icon,
     required String label,
@@ -277,6 +367,42 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard({
+    required IconData icon,
+    required String title,
+    required String value,
+    required Color color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 32),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[600],
             ),
           ),
         ],
@@ -361,13 +487,14 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
       children: const [
-        Text('A modern book store app built with Flutter.'),
+        Text('A modern book store app built with Flutter and Firebase.'),
         SizedBox(height: 16),
         Text('Features:'),
         Text('• Browse thousands of books'),
         Text('• Multi-language support'),
-        Text('• Secure payment system'),
+        Text('• Secure Firebase authentication'),
         Text('• Personal library management'),
+        Text('• Real-time data synchronization'),
       ],
     );
   }
@@ -384,9 +511,28 @@ class ProfileScreen extends StatelessWidget {
             child: Text(AppLocalizations.of(context)!.cancel),
           ),
           ElevatedButton(
-            onPressed: () {
-              authProvider.logout();
+            onPressed: () async {
               Navigator.of(context).pop();
+              try {
+                await authProvider.logout();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Successfully logged out'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Logout failed: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red[400],

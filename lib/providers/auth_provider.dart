@@ -1,39 +1,63 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
-import '../models/user_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../models/user_model.dart' as app_models;
+import '../services/firebase_auth_service.dart';
 
 enum AuthState { loading, authenticated, unauthenticated }
 
 class AuthProvider with ChangeNotifier {
-  User? _user;
+  final FirebaseAuthService _authService = FirebaseAuthService();
+
+  app_models.User? _user;
   AuthState _authState = AuthState.loading;
   String? _errorMessage;
 
-  User? get user => _user;
+  app_models.User? get user => _user;
   AuthState get authState => _authState;
   bool get isLoggedIn => _authState == AuthState.authenticated;
   bool get isLoading => _authState == AuthState.loading;
   String? get errorMessage => _errorMessage;
 
+  AuthProvider() {
+    _initializeAuth();
+  }
+
+  void _initializeAuth() {
+    // Listen to auth state changes
+    _authService.authStateChanges.listen((User? firebaseUser) async {
+      if (firebaseUser != null) {
+        try {
+          // Get user data from Firestore
+          _user = await _authService.getUserData(firebaseUser.uid);
+          _authState = AuthState.authenticated;
+        } catch (e) {
+          print('Error getting user data: $e');
+          _authState = AuthState.unauthenticated;
+          _user = null;
+        }
+      } else {
+        _user = null;
+        _authState = AuthState.unauthenticated;
+      }
+      notifyListeners();
+    });
+  }
+
   Future<void> initializeAuth() async {
     _authState = AuthState.loading;
     notifyListeners();
 
-    // Simulate splash screen delay
+    // Add splash screen delay
     await Future.delayed(const Duration(seconds: 3));
 
-    final prefs = await SharedPreferences.getInstance();
-    final userData = prefs.getString('user_data');
-    final isLoggedIn = prefs.getBool('is_logged_in') ?? false;
-
-    if (isLoggedIn && userData != null) {
+    // Check if user is already signed in
+    if (_authService.currentUser != null) {
       try {
-        _user = User.fromJson(json.decode(userData));
+        _user = await _authService.getUserData(_authService.currentUser!.uid);
         _authState = AuthState.authenticated;
       } catch (e) {
         _authState = AuthState.unauthenticated;
-        await prefs.clear();
+        _user = null;
       }
     } else {
       _authState = AuthState.unauthenticated;
@@ -46,54 +70,32 @@ class AuthProvider with ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      _user = await _authService.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-    // Simple validation
-    if (email.isEmpty || password.isEmpty) {
-      _errorMessage = 'Please fill all fields';
+      if (_user != null) {
+        _authState = AuthState.authenticated;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = 'Login failed. Please try again.';
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
       notifyListeners();
       return false;
     }
-
-    if (!email.contains('@')) {
-      _errorMessage = 'Please enter a valid email';
-      notifyListeners();
-      return false;
-    }
-
-    if (password.length < 6) {
-      _errorMessage = 'Password must be at least 6 characters';
-      notifyListeners();
-      return false;
-    }
-
-    // Simulate successful login
-    _user = User(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: email.split('@')[0].toUpperCase(),
-      email: email,
-      phone: '+1234567890',
-      address: '123 Main Street, City, Country',
-    );
-
-    _authState = AuthState.authenticated;
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('is_logged_in', true);
-    await prefs.setString('user_data', json.encode(_user!.toJson()));
-
-    notifyListeners();
-    return true;
   }
 
   Future<bool> register(String name, String email, String password,
       String confirmPassword) async {
     _errorMessage = null;
     notifyListeners();
-
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
 
     // Validation
     if (name.isEmpty ||
@@ -123,44 +125,69 @@ class AuthProvider with ChangeNotifier {
       return false;
     }
 
-    // Simulate successful registration
-    _user = User(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: name,
-      email: email,
-    );
+    try {
+      _user = await _authService.registerWithEmailAndPassword(
+        email: email,
+        password: password,
+        name: name,
+      );
 
-    _authState = AuthState.authenticated;
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('is_logged_in', true);
-    await prefs.setString('user_data', json.encode(_user!.toJson()));
-
-    notifyListeners();
-    return true;
+      if (_user != null) {
+        _authState = AuthState.authenticated;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = 'Registration failed. Please try again.';
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
+      return false;
+    }
   }
 
   Future<void> logout() async {
-    _user = null;
-    _authState = AuthState.unauthenticated;
-    _errorMessage = null;
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-
-    notifyListeners();
+    try {
+      await _authService.signOut();
+      _user = null;
+      _authState = AuthState.unauthenticated;
+      _errorMessage = null;
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = 'Failed to logout: ${e.toString()}';
+      notifyListeners();
+    }
   }
 
   Future<void> updateProfile(String name, String phone, String address) async {
     if (_user != null) {
-      _user!.name = name;
-      _user!.phone = phone;
-      _user!.address = address;
+      try {
+        _user!.name = name;
+        _user!.phone = phone;
+        _user!.address = address;
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('user_data', json.encode(_user!.toJson()));
+        await _authService.updateUserProfile(_user!);
+        notifyListeners();
+      } catch (e) {
+        _errorMessage = 'Failed to update profile: ${e.toString()}';
+        notifyListeners();
+        rethrow;
+      }
+    }
+  }
 
+  Future<void> resetPassword(String email) async {
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await _authService.resetPassword(email);
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
       notifyListeners();
+      rethrow;
     }
   }
 
