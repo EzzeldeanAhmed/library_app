@@ -27,13 +27,27 @@ class AuthProvider with ChangeNotifier {
     _authService.authStateChanges.listen((User? firebaseUser) async {
       if (firebaseUser != null) {
         try {
+          // Wait a bit for Firebase to be fully ready
+          await Future.delayed(const Duration(milliseconds: 500));
+
           // Get user data from Firestore
           _user = await _authService.getUserData(firebaseUser.uid);
           _authState = AuthState.authenticated;
         } catch (e) {
           print('Error getting user data: $e');
-          _authState = AuthState.unauthenticated;
-          _user = null;
+          // If there's an error, try to create a basic user object
+          try {
+            _user = app_models.User(
+              id: firebaseUser.uid,
+              name: firebaseUser.displayName ?? 'User',
+              email: firebaseUser.email ?? '',
+            );
+            _authState = AuthState.authenticated;
+          } catch (fallbackError) {
+            print('Fallback user creation failed: $fallbackError');
+            _authState = AuthState.unauthenticated;
+            _user = null;
+          }
         }
       } else {
         _user = null;

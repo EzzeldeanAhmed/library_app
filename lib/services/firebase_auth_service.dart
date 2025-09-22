@@ -18,43 +18,62 @@ class FirebaseAuthService {
     required String password,
   }) async {
     try {
+      print('Starting login for email: $email');
+
       UserCredential result = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
       User? firebaseUser = result.user;
-      if (firebaseUser != null) {
-        // Get user data from Firestore
-        DocumentSnapshot userDoc =
-            await _firestore.collection('users').doc(firebaseUser.uid).get();
+      print('Firebase user created: ${firebaseUser?.uid}');
 
-        if (userDoc.exists) {
-          Map<String, dynamic> userData =
-              userDoc.data() as Map<String, dynamic>;
-          return app_models.User(
-            id: firebaseUser.uid,
-            name: userData['name'] ?? '',
-            email: firebaseUser.email ?? '',
-            phone: userData['phone'] ?? '',
-            address: userData['address'] ?? '',
-            profileImage: userData['profileImage'] ?? '',
-          );
-        } else {
-          // Create user document if it doesn't exist
-          app_models.User newUser = app_models.User(
-            id: firebaseUser.uid,
-            name: firebaseUser.displayName ?? 'User',
-            email: firebaseUser.email ?? '',
-          );
-          await createUserDocument(newUser);
-          return newUser;
+      if (firebaseUser != null) {
+        // Return a basic user object first, then try to get full data
+        app_models.User basicUser = app_models.User(
+          id: firebaseUser.uid,
+          name: firebaseUser.displayName ?? 'User',
+          email: firebaseUser.email ?? '',
+        );
+
+        try {
+          print('Trying to fetch user data from Firestore...');
+          // Try to get additional user data from Firestore
+          DocumentSnapshot userDoc =
+              await _firestore.collection('users').doc(firebaseUser.uid).get();
+
+          print('Firestore document exists: ${userDoc.exists}');
+
+          if (userDoc.exists) {
+            Map<String, dynamic> userData =
+                userDoc.data() as Map<String, dynamic>;
+            print('User data retrieved: $userData');
+            return app_models.User(
+              id: firebaseUser.uid,
+              name: userData['name'] ?? firebaseUser.displayName ?? 'User',
+              email: firebaseUser.email ?? '',
+              phone: userData['phone'] ?? '',
+              address: userData['address'] ?? '',
+              profileImage: userData['profileImage'] ?? '',
+            );
+          } else {
+            print('User document does not exist, creating one...');
+            // Create user document if it doesn't exist
+            await createUserDocument(basicUser);
+            return basicUser;
+          }
+        } catch (firestoreError) {
+          print('Firestore error during login: $firestoreError');
+          // If Firestore fails, return the basic user object
+          return basicUser;
         }
       }
       return null;
     } on FirebaseAuthException catch (e) {
+      print('Firebase Auth Exception: ${e.code} - ${e.message}');
       throw _handleAuthException(e);
     } catch (e) {
+      print('Unexpected error during login: $e');
       throw Exception('An unexpected error occurred: ${e.toString()}');
     }
   }
@@ -150,7 +169,9 @@ class FirebaseAuthService {
       }
       return null;
     } catch (e) {
-      throw Exception('Failed to get user data: ${e.toString()}');
+      print('Error getting user data: $e');
+      // Return null instead of throwing to prevent crashes
+      return null;
     }
   }
 

@@ -522,6 +522,7 @@ class ProfileScreen extends StatelessWidget {
                       backgroundColor: Colors.green,
                     ),
                   );
+                  Navigator.of(context).pop();
                 }
               } catch (e) {
                 if (context.mounted) {

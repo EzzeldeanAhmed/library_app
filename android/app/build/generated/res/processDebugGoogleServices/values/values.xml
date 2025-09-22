@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="gcm_defaultSenderId" translatable="false">758374509615</string>
-    <string name="google_api_key" translatable="false">AIzaSyAdlVTbhQlTh-j0Q4jl2UReuNi9eJsrK1U</string>
-    <string name="google_app_id" translatable="false">1:758374509615:android:08e13c4d32d93fb2b82ada</string>
-    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyAdlVTbhQlTh-j0Q4jl2UReuNi9eJsrK1U</string>
-    <string name="google_storage_bucket" translatable="false">fluttercourse-a356b.firebasestorage.app</string>
-    <string name="project_id" translatable="false">fluttercourse-a356b</string>
-</resources>
